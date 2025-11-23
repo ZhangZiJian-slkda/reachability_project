@@ -1,0 +1,2 @@
+# reachability_project
+基于kuka-iiwa-LBRMed系列机械臂的可达性和灵活性仿真研究
