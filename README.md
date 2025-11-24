@@ -2,7 +2,7 @@
  * @Author: Zhang-sklda 845603757@qq.com
  * @Date: 2025-11-23 21:59:57
  * @LastEditors: Zhang-sklda 845603757@qq.com
- * @LastEditTime: 2025-11-24 00:08:10
+ * @LastEditTime: 2025-11-24 23:05:06
  * @FilePath: /reachability_project/README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -24,9 +24,11 @@ reachability_project/
 └── README.md
 
 
-
-Day 0（现在）：我已经读完论文（引用见上）。接下来按下面步骤你可以马上开始并在本周内看到成果。
-Day 1：在你的 Linux 机上按我给的依赖安装（或把你现有环境告诉我，我将给精确命令）。准备 KUKA iiwa MJCF/URDF 放到 models/。运行上面 run_generation.py（samples=20000）观察生成速度与 map 大小。
-Day 2：视运行结果加入：1) map 存盘/加载功能；2) 可视化一个横截面（绘制 capability heatmap）；3) 用少量随机点做 IK 验证以估计 FK-only map 的 FP/FN。
-Day 3–4：实现 HYB：在 FK 阶段统计新 bin 发现比率，低于阈值时列出未覆盖的 bins 并用 IK solver 验证（我会给 IK 数值实现或指导使用 ikpy / custom Newton method）。
-Day 5–7：加入环境碰撞检查（点云 KD-tree + primitive），并做参数 sweep（r, da, dr）记录 memory/accuracy trade-off（论文中给了类似试验，可复现）。生成 capability 可视化与体积统计（参考论文表格格式）。
+robot_model.py
+1.初始化测试 - 成功加载 KUKA iiwa 模型，正确识别7个关节
+2.零位姿正向运动学 - 返回正确的位置 [0, 0, 1.306] 和单位旋转矩阵
+3.不同位姿正向运动学 - 各种关节配置下FK计算正确
+4.随机关节采样 - 成功生成随机关节角度
+5.正向运动学一致性 - 多次计算相同配置结果一致
+6.自定义TCP站点 - 正确使用 attachment_site
+7.错误输入处理测试

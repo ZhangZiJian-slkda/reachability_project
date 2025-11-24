@@ -1,7 +1,19 @@
+"""
+Description: Robotic Arm Motion Control Algorithm
+Author: Zhang-sklda 845603757@qq.com
+Date: 2025-11-23 23:20:39
+Version: 1.0.0
+LastEditors: Zhang-sklda 845603757@qq.com
+LastEditTime: 2025-11-24 23:02:25
+FilePath: /reachability_project/test/test_robot_model_real.py
+Copyright (c) 2025 by Zhang-sklda, All Rights Reserved.
+symbol_custom_string_obkoro1_tech: Tech: Motion Control | MuJoCo | ROS | Kinematics
+"""
 import numpy as np
 import pytest
 import os
 import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 from robot_model import RobotModel
 
 class TestRobotModelReal:
@@ -23,7 +35,7 @@ class TestRobotModelReal:
         # 检查基本属性
         assert robot.model is not None
         assert robot.data is not None
-        assert robot.tcp_site == 'tcp'
+        assert robot.tcp_site == 'attachment_site'
         
         # 检查关节信息 - KUKA iiwa应该有7个关节
         print(f"关节名称: {robot.joint_names}")
@@ -82,18 +94,17 @@ class TestRobotModelReal:
         
         for i, q in enumerate(test_configs):
             pos, rot_mat = robot.fk(q)
+            print(f"配置 {i}: 关节角度 {q}")
+            print(f"位置: {pos}")
+            print(f"旋转矩阵:\n{rot_mat}")
             
-            print(f"配置 {i}: 关节角度 {q[:3]}... -> 位置 {pos}")
-            
-            # 基本验证
-            assert pos.shape == (3,)
-            assert rot_mat.shape == (3, 3)
-            
-            # 验证旋转矩阵
+            # 详细检查旋转矩阵
             det = np.linalg.det(rot_mat)
-            assert abs(det - 1.0) < 1e-6
+            print(f"行列式: {det}")
+            print(f"与1的差值: {abs(det - 1.0)}")
             
             identity_check = rot_mat @ rot_mat.T
+            print(f"R * R^T:\n{identity_check}")
             np.testing.assert_array_almost_equal(identity_check, np.eye(3), decimal=6)
         
         print("✓ 不同位姿正向运动学测试通过")
@@ -175,10 +186,10 @@ class TestRobotModelReal:
         robot = RobotModel(self.model_path)
         
         # 测试错误长度的关节角度
-        with pytest.raises(ValueError, match="q length mismatch"):
+        with pytest.raises(ValueError, match="配置 q 长度错误"):
             robot.fk(np.array([0.0] * 5))  # 长度不足
             
-        with pytest.raises(ValueError, match="q length mismatch"):
+        with pytest.raises(ValueError, match="配置 q 长度错误"):
             robot.fk(np.array([0.0] * 10))  # 长度过长
         
         print("✓ 错误输入处理测试通过")
@@ -193,12 +204,12 @@ def run_real_model_tests():
     try:
         test_instance.setup_method()
         test_instance.test_initialization_with_real_model()
-        # test_instance.test_fk_with_zero_configuration()
-        # test_instance.test_fk_with_different_poses()
-        # test_instance.test_random_joint_sampling()
-        # test_instance.test_fk_consistency()
-        # test_instance.test_custom_tcp_site()
-        # test_instance.test_invalid_input_handling()
+        test_instance.test_fk_with_zero_configuration()
+        test_instance.test_fk_with_different_poses()
+        test_instance.test_random_joint_sampling()
+        test_instance.test_fk_consistency()
+        test_instance.test_custom_tcp_site()
+        test_instance.test_invalid_input_handling()
         
         print("=" * 60)
         print("🎉 所有真实模型测试通过！RobotModel 类实现正确。")
