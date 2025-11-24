@@ -11,8 +11,6 @@ class RobotModel:
         self.model = mujoco.MjModel.from_xml_path(model_path)
         self.data = mujoco.MjData(self.model)
         self.tcp_site = tcp_site_name
-
-        
         # 正确获取关节信息
         self.joint_names = []
         for i in range(self.model.njnt):
@@ -36,7 +34,6 @@ class RobotModel:
         if sid < 0:
             raise ValueError(f"给定的 tcp_site_name='{tcp_site_name}' 不存在于模型中！")
         self.tcp_sid = sid
-
 
     def fk(self,q):
         """返回末端位置 pos(3,) 和旋转矩阵 rot(3,3)"""
