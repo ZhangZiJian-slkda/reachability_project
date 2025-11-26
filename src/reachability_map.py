@@ -4,7 +4,7 @@ Author: Zhang-sklda 845603757@qq.com
 Date: 2025-11-24 23:24:26
 Version: 1.0.0
 LastEditors: Zhang-sklda 845603757@qq.com
-LastEditTime: 2025-11-24 23:44:38
+LastEditTime: 2025-11-26 22:18:14
 FilePath: /reachability_project/src/reachability_map.py
 Copyright (c) 2025 by Zhang-sklda, All Rights Reserved.
 symbol_custom_string_obkoro1_tech: Tech: Motion Control | MuJoCo | ROS | Kinematics
@@ -69,8 +69,6 @@ class ReachabilityMap:
             directions.append(np.array([x,y,z]))
             
         return directions
-    
-
 
     def fc(self,tx,ty,tz):
         """将三维位置映射到体素索引"""
@@ -112,10 +110,24 @@ class ReachabilityMap:
     def set_bin(self, ic, ia, ir):
         """标记体素为可达"""
         if ic is None:
-            return
+            return False
         bit_idx = ic * self.bits_per_voxel + ia * self.dr + ir
         if 0 <= bit_idx < len(self.bits):
             self.bits[bit_idx] = True
+            return True
+
+    def count_true_bins(self):
+        """统计可达体素数量"""
+        return self.bits.count(True)
+    
+    def count_true_voxels(self):
+        """统计包含至少一个可达方向的体素数量"""
+        count = 0
+        for ix in range(self.voxel_count):
+            if any(self.bits[ix * self.bits_per_voxel:(ix+1)*self.bits_per_voxel]):
+                count += 1
+        return count
+    
 
     def query_bin(self, ic, ia, ir):
         """查询体素是否可达"""

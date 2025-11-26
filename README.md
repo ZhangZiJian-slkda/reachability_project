@@ -2,7 +2,7 @@
  * @Author: Zhang-sklda 845603757@qq.com
  * @Date: 2025-11-23 21:59:57
  * @LastEditors: Zhang-sklda 845603757@qq.com
- * @LastEditTime: 2025-11-25 00:15:02
+ * @LastEditTime: 2025-11-25 23:52:16
  * @FilePath: /reachability_project/README.md
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
 -->
@@ -78,4 +78,25 @@ Sampler：实现 FK 随机采样模块（生成随机 joint vector → FK → ma
 环境与碰撞：实现环境点云（或 CAD 网格离散为点集）导入 + KD-tree 加速 radius queries + primitive 近似碰撞（球/圆柱）或直接使用 MuJoCo 碰撞检测（速度可能略慢，但更精确）。
 分析/可视化与优化：计算 Capability（reachability index）、可视化横截面热图、统计体积/高 dexterity 区域（论文 Table III/IV 风格），并进行参数 sweep（r, da, dr）与内存/精度折中（参考论文 Table II）。
 
+
+HYB = Hybrid FK + IK
+论文建议：
+1. FK 阶段填满大部分 map（你已经开始做了）
+2. 对剩余空 bin 用 IK 验证
+根据体素中心 + approach 方向 + roll 构造目标 pose
+使用数值 IK 求解（Jacobian 法）
+如果 IK 可达，则填 bin = True
+我可以为你写一个简洁但稳定的数值 IK（牛顿法 + damped least squares）。
+任务 4：加入碰撞检测（关键）
+你的 XML 中 已包含所有 collision geoms，所以不需要点云 KD-tree。
+只需在 FK 或 IK 后：
+mujoco.mj_forward(model, data)
+if data.ncon > 0:
+    pose is invalid
+即可过滤掉碰撞姿态。
+任务 5：输出与可视化
+完成：
+capability map（每个 voxel 的 reachable ratio）
+3D 热图（matplotlib 或 open3d）
+保存 bitarray（已经有结构了）
 
